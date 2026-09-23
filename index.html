@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banque Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap');
+
+:root {
+  --vert: #00915a;
+  --vert-dark: #00693f;
+  --vert-light: #e6f4ef;
+  --gris: #f5f7fa;
+  --gris-input: #f0f2f5;
+  --gris-text: #444;
+  --radius: 8px;
+  --transition: 0.4s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--gris); color: var(--gris-text); }
+
+nav {
+  background: var(--vert);
+  padding: 0 2rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.nav-left { display: flex; align-items: center; gap: 0.7rem; }
+.nav-right { display: flex; align-items: center; gap: 0.5rem; }
+.nav-btn { color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius); font-weight: 600; cursor: pointer; border: none; background: transparent; font-size: 0.9rem; white-space: nowrap; }
+.nav-btn:hover { background: rgba(255,255,255,0.15); }
+.burger { display: none; flex-direction: column; gap: 4px; cursor: pointer; padding: 0.4rem; }
+.burger span { width: 22px; height: 2px; background: #fff; border-radius: 2px; }
+
+.logo { width: 110px; height: auto; filter: brightness(0) invert(1); }
+.logo-dark { filter: none; width: 100px; }
+.logo-banque { width: 130px; height: auto; } /* Logo page banque */
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-left { display: flex; align-items: center; gap: 0.7rem; min-width: 0; flex: 1 1 auto; }
+.hero-text { font-size: 1rem; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+.hero-right { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+.btn {
+  padding: 0.45rem 1.1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.btn-white { background: #fff; color: var(--vert); border: 1.5px solid var(--vert); }
+.btn-green { background: var(--vert); color: #fff; border: 1.5px solid var(--vert); }
+.btn-green:hover { background: var(--vert-dark); }
+
+.section-img { width: 100%; display: block; margin-bottom: 1.2rem; }
+.section-img img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(245,247,250,0.85);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.overlay.active { display: flex; }
+
+.loader {
+  width: 50px; height: 50px;
+  border: 4px solid var(--vert-light);
+  border-top: 4px solid var(--vert);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* ===== PAGES ===== */
+.page { display: none; min-height: 100vh; background: var(--gris); flex-direction: column; }
+.page.active { display: flex; animation: slideIn 0.4s ease; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== CONNEXION ===== */
+.connexion-body { display: grid; grid-template-columns: 1fr 1fr; flex: 1; }
+.connexion-left { background: var(--vert); color: #fff; padding: 3rem 2.5rem; }
+.connexion-left h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+.form-group { margin-bottom: 1.2rem; max-width: 320px; }
+.form-group label { font-weight: 600; display: block; margin-bottom: 0.5rem; }
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--gris-input);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid var(--vert);
+}
+
+/* ID EN GRAS GRIS + REDUIT SUR MOBILE */
+.input-wrapper input {
+  flex: 1;
+  padding: 0.9rem 1rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-weight: 700; /* GRAS */
+  background: var(--gris-input);
+  color: #333;
+  max-width: 280px;
+}
+
+.input-clear { padding: 0 1rem; cursor: pointer; color: #666; font-size: 1.2rem; font-weight: 600; }
+
+.checkbox-group { display: flex; align-items: center; gap: 0.6rem; margin: 1.2rem 0 1.5rem; font-weight: 600; }
+
+.btn-continuer, .btn-acceder {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.9rem;
+  background: #b8d4c9;
+  color: var(--vert-dark);
+  border: none;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto 1.5rem;
+}
+
+.btn-acceder { display: none; }
+.btn-acceder.active { display: block; }
+
+.code-section { display: none; text-align: center; margin: 1.5rem 0; }
+.code-section.active { display: block; }
+
+.code-dots { display: flex; justify-content: center; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+.dot.filled { background: #fff; }
+
+.keypad { display: none; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; max-width: 320px; margin: 0 auto 1.5rem; }
+.keypad.active { display: grid; }
+.key { background: var(--gris-input); color: #333; border: none; border-radius: 6px; padding: 0.9rem; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+
+.connexion-right { background: #fff; color: var(--gris-text); padding: 3rem 2.5rem; }
+.lock-icon {
+  width: 24px; height: 24px;
+  background: #9e9e9e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+}
+.security-text { margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6; font-weight: 500; }
+
+/* ===== BANQUE ===== */
+.banque-topbar {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.banque-logo-wrap { display: flex; align-items: center; gap: 0.7rem; }
+.banque-logo-wrap .hero-text { color: #333; font-size: 0.9rem; font-weight: 700; }
+.top-actions { display: flex; gap: 1rem; align-items: center; }
+.top-actions button { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; }
+
+/* ONGLETS HAUT COMME TON IMAGE */
+.banque-tabs {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 2rem;
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+}
+.tab {
+  padding: 1rem 0;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.tab:hover { color: var(--vert); }
+.tab.active { color: var(--vert); border-bottom-color: var(--vert); font-weight: 700; }
+
+.banque-layout { display: flex; flex: 1; }
+
+.sidebar {
+  width: 260px;
+  background: var(--vert-dark);
+  color: #fff;
+  padding: 1.5rem 0;
+  flex-shrink: 0;
+}
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.sidebar-item:hover, .sidebar-item.active { background: rgba(255,255,255,0.15); }
+.sidebar-icon { width: 20px; height: 20px; filter: brightness(0) invert(1); }
+
+.main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+
+.view { display: none; }
+.view.active { display: block; animation: slideIn 0.4s ease; }
+
+.banner {
+  background: linear-gradient(135deg, #00a76f 0%, var(--vert) 100%);
+  color: #fff;
+  padding: 2rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+.banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.banner-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+
+.balances-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.balance-box {
+  background: #fff;
+  padding: 1.2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border-left: 4px solid var(--vert);
+}
+.balance-label { font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600; }
+.balance-value { font-size: 1.4rem; font-weight: 700; color: #1a1a1a; }
+.balance-value.negative { color: #d32f2f; }
+
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.card-box {
+  background: linear-gradient(135deg, #2c3e50 0%, #4a5568 100%);
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.card-type { font-size: 0.8rem; opacity: 0.8; margin-bottom: 1rem; font-weight: 600; }
+.card-number { font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 1rem; font-family: monospace; font-weight: 600; }
+.card-bottom { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 500; }
+
+.actions-bar { display: flex; gap: 1rem; margin-bottom: 2rem; align-items: center; flex-wrap: wrap; }
+.btn-action { padding: 0.7rem 1.2rem; background: var(--vert); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+.btn-action:hover { background: var(--vert-dark); }
+.btn-success { background: #2e7d32; }
+
+.data-table {
+  width: 100%;
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  margin-bottom: 2rem;
+}
+.data-table table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  background: var(--vert-light);
+  color: var(--vert-dark);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+.data-table td { padding: 1rem; border-bottom: 1px solid #eee; font-weight: 500; }
+.data-table tr:hover { background: var(--gris); }
+
+.inline-form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  margin-bottom: 2rem;
+}
+.inline-form h3 { color: var(--vert); margin-bottom: 1.5rem; font-size: 1.3rem; }
+.inline-form .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.inline-form input, .inline-form select {
+  width: 100%;
+  padding: 0.9rem;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  background: var(--gris-input);
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+}
+.inline-form input:focus, .inline-form select:focus { border-color: var(--vert); outline: none; }
+
+.alert-success {
+  background: #e8f5e9;
+  border: 2px solid #2e7d32;
+  color: #1b5e20;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  display: none;
+}
+.alert-success.active { display: block; }
+
+.alert-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(245,247,250,0.98);
+  border: 2px solid var(--vert);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0,145,90,0.2);
+  z-index: 10000;
+  display: none;
+  text-align: center;
+  animation: popupIn 0.3s ease forwards;
+}
+.alert-popup.active { display: block; }
+@keyframes popupIn { to { transform: translate(-50%, -50%) scale(1); } }
+.alert-popup .alert-icon { font-size: 3rem; margin-bottom: 1rem; color: var(--vert); }
+.alert-popup h3 { color: var(--vert-dark); margin-bottom: 1rem; font-weight: 700; }
+.alert-popup p { color: var(--gris-text); line-height: 1.6; margin-bottom: 1rem; font-weight: 500; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .banque-tabs { padding: 0 1rem; gap: 1rem; }
+  .main-content { padding: 1rem; }
+  .balances-row { grid-template-columns: repeat(2, 1fr); }
+  .inline-form .grid-2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  nav { padding: 0 1rem; }
+  .nav-btn { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
+  .hero { padding: 0.4rem 1rem; gap: 0.6rem; }
+  .logo { width: 85px; }
+  .hero-text { display: none; }
+  .btn { padding: 0.35rem 0.8rem; font-size: 0.78rem; }
+  .hero-right { gap: 0.4rem; width: 100%; justify-content: flex-end; }
+  .nav-right {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    background: var(--vert);
+    flex-direction: column;
+    width: 180px;
+    padding: 0.8rem;
+    transform: translateX(100%);
+    transition: var(--transition);
+  }
+  .nav-right.active { transform: translateX(0); }
+  .burger { display: flex; }
+  .connexion-body { grid-template-columns: 1fr; }
+  .connexion-left, .connexion-right { padding: 2rem 1.5rem; }
+  
+  /* CHAMP ID REDUIT SUR MOBILE */
+  .form-group { max-width: 100%; }
+  .input-wrapper input { max-width: 180px; }
+  
+  .keypad { grid-template-columns: repeat(5, 1fr); gap: 0.6rem; }
+  .banner-title { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 ACCUEIL -->
+<div class="page active" id="pageAccueil">
+  <nav>
+    <div class="nav-left"><button class="nav-btn">Accueil</button></div>
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
+    <div class="nav-right" id="navRight">
+      <button class="nav-btn btn-portal">Professionnels</button>
+      <button class="nav-btn btn-portal">Entreprises</button>
+      <button class="nav-btn btn-portal">Accessibilité</button>
+      <button class="nav-btn" id="langBtn">FR</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <img src="logo.png" alt="Logo" class="logo-dark">
+      <p class="hero-text">La banque d'un monde qui change</p>
+    </div>
+    <div class="hero-right">
+      <button class="btn btn-white" id="btnConnexion">Accéder à mes comptes</button>
+      <button class="btn btn-green btn-portal">Devenir client</button>
+    </div>
+  </section>
+
+  <div class="section-img"><img src="body.png" alt="Body"></div>
+  <div class="section-img"><img src="body1.png" alt="Body1"></div>
+  <div class="section-img"><img src="footer.png" alt="Footer"></div>
+</div>
+
+<div class="overlay" id="overlay"><div class="loader"></div></div>
+<!-- PAGE 2 CONNEXION -->
+<div class="page" id="pageConnexion">
+  <nav>
+    <div class="nav-left">
+      <div class="hero-left">
+        <img src="logo.png" alt="Logo" class="logo-dark">
+        <p class="hero-text">La banque d'un monde qui change</p>
+      </div>
+    </div>
+    <div class="burger" id="burger2"><span></span><span></span><span></span></div>
+    <div class="nav-right" id="navRight2">
+      <button class="nav-btn btn-portal">Professionnels</button>
+      <button class="nav-btn btn-portal">Entreprises</button>
+      <button class="nav-btn btn-portal">Accessibilité</button>
+      <button class="nav-btn" id="langBtn2">FR</button>
+    </div>
+  </nav>
+
+  <div class="connexion-body">
+    <div class="connexion-left">
+      <h2>Accédez à votre espace client</h2>
+      <div class="form-group">
+        <label>Numéro Client</label>
+        <div class="input-wrapper">
+          <input type="text" inputmode="numeric" maxlength="10" placeholder="Numéro de 7 à 10 chiffres" id="numClient">
+          <span class="input-clear" id="clearNum">×</span>
+        </div>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="remember">
+        <label for="remember">Mémoriser mon numéro client</label>
+        <span>ⓘ</span>
+      </div>
+      <button class="btn-continuer" id="btnContinuer">Continuer</button>
+      
+      <div class="code-section" id="codeSection">
+        <p><strong>Saisissez votre code secret</strong></p>
+        <div class="code-dots" id="codeDots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <span class="input-clear" id="clearCode">×</span>
+        </div>
+        <div class="keypad" id="keypad">
+          <button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
+          <button class="key" data-key="7">7</button><button class="key" data-key="8">8</button>
+          <button class="key" data-key="4">4</button><button class="key" data-key="9">9</button>
+          <button class="key" data-key="0">0</button><button class="key" data-key="6">6</button>
+          <button class="key" data-key="1">1</button><button class="key" data-key="5">5</button>
+        </div>
+        <button class="btn-acceder" id="btnAcceder">Accéder à mon espace client</button>
+      </div>
+      <a href="#" style="color:#fff;text-decoration:underline;display:block;text-align:center;font-size:0.9rem;font-weight:600">Numéro client ou code secret oublié</a>
+    </div>
+    
+    <div class="connexion-right">
+      <h3 style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.5rem;font-weight:700"><span class="lock-icon">🔒</span> Sécurité</h3>
+      <p class="security-text">Avant de vous connecter, vérifiez que l'adresse de cette page commence bien par https://</p>
+      <p class="security-text">Ne communiquez jamais votre code secret par téléphone ou par email.</p>
+    </div>
+  </div>
+  
+  <div class="section-img"><img src="body2.png" alt="Body2"></div>
+  <div class="section-img"><img src="footer.png" alt="Footer"></div>
+</div>
+
+<!-- PAGE 3 BANQUE -->
+<div class="page" id="pageBanque">
+  <div class="banque-topbar">
+    <div class="banque-logo-wrap">
+      <img src="logo.png" alt="Logo" class="logo-banque"> <!-- LOGO ICI EN HAUT -->
+      <p class="hero-text">La banque d'un monde qui change</p>
+    </div>
+    <div class="top-actions">
+      <button title="Recher">🔍</button>
+      <button title="Notifications">🔔</button>
+      <button title="Paramètres">⚙️</button>
+      <button id="btnDeconnexion" title="Déconnexion">🚪</button>
+    </div>
+  </div>
+
+  <!-- ONGLETS HAUT FONCTIONNELS COMME TA CAPTURE -->
+  <div class="banque-tabs">
+    <div class="tab active" data-tab="comptes">MES COMPTES</div>
+    <div class="tab" data-tab="cartes">MES CARTES</div>
+    <div class="tab" data-tab="assurances">MES ASSURANCES</div>
+    <div class="tab" data-tab="epargne">ÉPARGNE</div>
+    <div class="tab" data-tab="credits">CRÉDITS</div>
+  </div>
+
+  <div class="banque-layout">
+    <div class="sidebar">
+      <div class="sidebar-item active" data-view="comptes">
+        <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zM3 8v10h18V8H3zm10-6L3 6v2h18V6l-10-4z"/></svg>
+        MES COMPTES & CONTRATS
+      </div>
+      <div class="sidebar-item" data-view="virement">
+        <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        VIREMENT & SERVICES
+      </div>
+      <div class="sidebar-item" data-view="benef">
+        <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3z"/></svg>
+        BÉNÉFICIAIRES
+      </div>
+      <div class="sidebar-item" data-view="budget">
+        <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h3v14h-3zm5.4 8h3v6h-3z"/></svg>
+        SUIVI MON BUDGET
+      </div>
+      <div class="sidebar-item" data-view="portefeuille">
+        <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+        PORTEFEUILLE & BOURSE
+      </div>
+      <div class="sidebar-item" data-view="rib">
+        <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h14v-6h2z"/></svg>
+        MON RIB
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- VUE COMPTES -->
+      <div class="view active" id="view-comptes">
+        <div class="banner">
+          <div class="banner-header">
+            <div>Accueil > Mes comptes et contrats</div>
+            <div>Dernière connexion: 23/09/2026 12:45</div>
+          </div>
+          <div class="banner-title">BONJOUR Mr Michel Flamier</div>
+        </div>
+
+        <div class="balances-row">
+          <div class="balance-box">
+            <div class="balance-label">SOLDE TOTAL</div>
+            <div class="balance-value" id="soldeTotal">7 350 000,00 €</div>
+          </div>
+          <div class="balance-box">
+            <div class="balance-label">CRÉDITS</div>
+            <div class="balance-value negative">- 50 000,00 €</div>
+          </div>
+          <div class="balance-box">
+            <div class="balance-label">LIQUIDITÉS</div>
+            <div class="balance-value" id="liquidites">92 304,00 €</div>
+          </div>
+          <div class="balance-box">
+            <div class="balance-label">ÉPARGNE</div>
+            <div class="balance-value">113 400,00 €</div>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom:1rem;color:#333;font-weight:700">Dernières opérations</h3>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Libellé</th><th>Montant</th><th>Solde</th></tr>
+            </thead>
+            <tbody id="tbodyOps">
+              <tr><td>04/10/2025</td><td>Virement reçu - SALAIRE</td><td style="color:var(--vert);font-weight:600">+2 500,00 €</td><td id="soldeRow1">2 304,00 €</td></tr>
+              <tr><td>03/10/2025</td><td>Paiement carte CARREFOUR</td><td style="color:#d32f2f;font-weight:600">-87,32 €</td><td>-196,00 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="actions-bar">
+          <button class="btn-action" data-view="rib">Voir/Modifier RIB</button>
+          <button class="btn-action" data-view="virement">Nouveau Virement</button>
+          <button class="btn-action" data-view="benef">Ajouter Bénéficiaire</button>
+        </div>
+      </div>
+            <!-- VUE RIB MODIFIABLE -->
+      <div class="view" id="view-rib">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Votre Relevé d'Identité Bancaire</h2>
+        <div class="inline-form">
+          <div class="grid-2">
+            <div><label>Titulaire du compte</label><input type="text" id="ribNom" value="FLAMIER MICHEL"></div>
+            <div><label>IBAN Fictif</label><input type="text" id="ribIban" value="FR76 3000 3003 3300 0002 0000 018" placeholder="FR76 XXXX..."></div>
+            <div><label>BIC</label><input type="text" id="ribBic" value="BNPFRP1XXX"></div>
+            <div><label>Domiciliation</label><input type="text" id="ribDom" value="BNP PARIBAS"></div>
+          </div>
+          <div style="margin-top:1.5rem">
+            <button class="btn-action" id="btnSaveRIB">Enregistrer RIB</button>
+            <button class="btn-action btn-portal">Télécharger PDF</button>
+            <button class="btn-action" data-view="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+          </div>
+          <p style="margin-top:1rem;font-size:0.85rem;color:#666;font-weight:500">* Modifiez l'IBAN pour mettre le RIB fictif que vous voulez</p>
+        </div>
+      </div>
+
+      <!-- VUE VIREMENT SIMULATION COMPLETE -->
+      <div class="view" id="view-virement">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Nouveau Virement</h2>
+        
+        <div class="alert-success" id="alertVirement">✅ Virement effectué avec succès</div>
+
+        <div class="inline-form">
+          <div class="grid-2">
+            <div>
+              <label>Compte émetteur</label>
+              <select id="compteEmetteur"><option value="2304">Compte courant - 2 304,00 €</option><option value="13400">Épargne - 13 400,00 €</option></select>
+            </div>
+            <div>
+              <label>Bénéficiaire</label>
+              <select id="benefSelect"><option value="">Sélectionner...</option><option value="JEAN DUPONT">JEAN DUPONT - FR14...</option><option value="MARIE DURAND">MARIE DURAND - FR76...</option></select>
+            </div>
+            <div><label>Montant €</label><input type="number" id="montantVirement" placeholder="0,00" step="0.01"></div>
+            <div><label>Motif</label><input type="text" id="motifVirement" placeholder="Loyer, facture..."></div>
+          </div>
+          <div style="margin-top:1.5rem">
+            <button class="btn-action btn-success" id="btnValiderVirement">Valider le virement</button>
+            <button class="btn-action" data-view="comptes" style="background:#9e9e9e;color:#fff">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VUE CARTES FONCTIONNELLE -->
+      <div class="view" id="view-cartes">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Mes Cartes Bancaires</h2>
+        <div class="cards-row">
+          <div class="card-box">
+            <div class="card-type">VISA PREMIER</div>
+            <div class="card-number">**** **** 4589</div>
+            <div class="card-bottom">
+              <span>MICHEL FLAMIER</span>
+              <span>12/27</span>
+            </div>
+            <div style="margin-top:1rem;display:flex;gap:0.5rem">
+              <button class="btn-action" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fff;color:var(--vert)">Bloquer</button>
+              <button class="btn-action" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fff;color:var(--vert)">Plafond</button>
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="card-type">MASTERCARD GOLD</div>
+            <div class="card-number">**** **** 7210</div>
+            <div class="card-bottom">
+              <span>FLAMIER MICHEL</span>
+              <span>08/26</span>
+            </div>
+            <div style="margin-top:1rem;display:flex;gap:0.5rem">
+              <button class="btn-action" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fff;color:var(--vert)">Bloquer</button>
+              <button class="btn-action" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fff;color:var(--vert)">Plafond</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-action btn-portal">Commander une nouvelle carte</button>
+        <button class="btn-action" data-tab="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+      </div>
+
+      <!-- VUE ASSURANCES -->
+      <div class="view" id="view-assurances">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Mes Assurances</h2>
+        <div class="data-table">
+          <table>
+            <thead><tr><th>Contrat</th><th>Échéance</th><th>Montant/mois</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr><td>Habitation</td><td>15/12/2025</td><td>28,50 €</td><td style="color:var(--vert);font-weight:600">Actif</td></tr>
+              <tr><td>Auto</td><td>03/06/2026</td><td>67,20 €</td><td style="color:var(--vert);font-weight:600">Actif</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn-action btn-portal">Ajouter une assurance</button>
+        <button class="btn-action" data-tab="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+      </div>
+
+      <!-- VUE EPARGNE -->
+      <div class="view" id="view-epargne">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Épargne</h2>
+        <div class="balances-row">
+          <div class="balance-box"><div class="balance-label">LIVRET A</div><div class="balance-value">8 200,00 €</div></div>
+          <div class="balance-box"><div class="balance-label">LDD</div><div class="balance-value">5 200,00 €</div></div>
+        </div>
+        <button class="btn-action btn-portal">Ouvrir un nouveau livret</button>
+        <button class="btn-action" data-tab="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+      </div>
+
+      <!-- VUE CREDITS -->
+      <div class="view" id="view-credits">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Mes Crédits</h2>
+        <div class="data-table">
+          <table>
+            <thead><tr><th>Type</th><th>Capital restant</th><th>Mensualité</th><th>Fin</th></tr></thead>
+            <tbody>
+              <tr><td>Immobilier</td><td>245 000,00 €</td><td>1 250,00 €</td><td>08/2045</td></tr>
+              <tr><td>Auto</td><td>10 500,00 €</td><td>320,00 €</td><td>03/2028</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn-action btn-portal">Simuler un crédit</button>
+        <button class="btn-action" data-tab="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+      </div>
+
+      <!-- VUE BENEFICIAIRES -->
+      <div class="view" id="view-benef">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Mes Bénéficiaires</h2>
+        <div class="data-table" style="margin-bottom:1.5rem">
+          <table>
+            <thead>
+              <tr><th>Nom</th><th>IBAN</th><th>Dernière opération</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>JEAN DUPONT</td><td>FR14 **** 1234</td><td>15/02/2025</td><td><button class="btn-action" style="padding:0.4rem 0.8rem;font-size:0.8rem" data-view="virement">Virement</button></td></tr>
+              <tr><td>MARIE DURAND</td><td>FR76 **** 5678</td><td>02/01/2025</td><td><button class="btn-action" style="padding:0.4rem 0.8rem;font-size:0.8rem" data-view="virement">Virement</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="inline-form">
+          <h3>Ajouter un bénéficiaire</h3>
+          <div class="grid-2">
+            <div><label>Nom du bénéficiaire</label><input type="text" placeholder="Nom Prénom"></div>
+            <div><label>IBAN</label><input type="text" placeholder="FR76..."></div>
+          </div>
+          <div style="margin-top:1.5rem">
+            <button class="btn-action btn-portal">Ajouter</button>
+            <button class="btn-action" data-view="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VUE BUDGET -->
+      <div class="view" id="view-budget">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Suivi de mon Budget</h2>
+        <div class="balances-row">
+          <div class="balance-box"><div class="balance-label">DÉPENSES OCT</div><div class="balance-value negative">-1 487,82 €</div></div>
+          <div class="balance-box"><div class="balance-label">REVENUS OCT</div><div class="balance-value" style="color:var(--vert)">+2 500,00 €</div></div>
+        </div>
+        <button class="btn-action" data-view="comptes">Retour aux comptes</button>
+      </div>
+
+      <!-- VUE PORTEFEUILLE -->
+      <div class="view" id="view-portefeuille">
+        <h2 style="color:var(--vert);margin-bottom:1.5rem;font-weight:700">Portefeuille & Bourse</h2>
+        <div class="balances-row">
+          <div class="balance-box"><div class="balance-label">VALEUR PORTEFEUILLE</div><div class="balance-value">45 230,50 €</div></div>
+          <div class="balance-box"><div class="balance-label">PLUS-VALUE</div><div class="balance-value" style="color:var(--vert)">+3 450,20 €</div></div>
+        </div>
+        <button class="btn-action btn-portal">Passer un ordre</button>
+        <button class="btn-action" data-view="comptes" style="background:#9e9e9e;color:#fff">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- POPUP BLOCAGE 8S VERT/GRIS -->
+<div class="alert-popup" id="modalBlock">
+  <div class="alert-icon">⚠️</div>
+  <h3>Compte soumis à vérification</h3>
+  <p>Votre compte présente des anomalies de sécurité et est temporairement bloqué pour vérification par nos services de conformité.</p>
+  <p><strong>Veuillez contacter votre conseiller dans les plus brefs délais.</strong></p>
+  <p style="font-size:0.85rem;color:#888;margin-top:1rem">Fermeture automatique dans 8 secondes...</p>
+</div>
+
+<script>
+const VALID_ID = '4590290859';
+const VALID_PASS = '156120';
+
+const pageAccueil = document.getElementById('pageAccueil');
+const pageConnexion = document.getElementById('pageConnexion');
+const pageBanque = document.getElementById('pageBanque');
+const overlay = document.getElementById('overlay');
+
+const btnConnexion = document.getElementById('btnConnexion');
+const btnContinuer = document.getElementById('btnContinuer');
+const btnAcceder = document.getElementById('btnAcceder');
+const btnDeconnexion = document.getElementById('btnDeconnexion');
+
+const numClient = document.getElementById('numClient');
+const codeSection = document.getElementById('codeSection');
+const keypad = document.getElementById('keypad');
+const codeDots = document.querySelectorAll('.dot');
+
+let secretCode = '';
+let currentSolde = 2304.00;
+
+// LOADING 2S SUR TOUS LES BOUTONS PORTAIL
+document.querySelectorAll('.btn-portal').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    overlay.classList.add('active');
+    setTimeout(() => overlay.classList.remove('active'), 2000);
+  });
+});
+
+// Navigation entre pages avec slide
+btnConnexion.onclick = () => {
+  overlay.classList.add('active');
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    pageAccueil.classList.remove('active');
+    pageConnexion.classList.add('active');
+  }, 3000);
+};
+
+btnContinuer.onclick = () => {
+  if(numClient.value.length >= 7 && numClient.value.length <= 10) {
+    codeSection.classList.add('active');
+    keypad.classList.add('active');
+  } else {
+    alert('Numéro entre 7 et 10 chiffres');
+  }
+};
+
+document.querySelectorAll('.key').forEach(key => {
+  key.onclick = () => {
+    if(secretCode.length < 6) {
+      secretCode += key.dataset.key;
+      codeDots.forEach((dot, i) => {
+        dot.classList.toggle('filled', i < secretCode.length);
+      });
+      if(secretCode.length === 6) btnAcceder.classList.add('active');
+    }
+  };
+});
+
+document.getElementById('clearCode').onclick = () => {
+  secretCode = '';
+  codeDots.forEach(d => d.classList.remove('filled'));
+  btnAcceder.classList.remove('active');
+};
+
+btnAcceder.onclick = () => {
+  if(numClient.value === VALID_ID && secretCode === VALID_PASS) {
+    overlay.classList.add('active');
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      pageConnexion.classList.remove('active');
+      pageBanque.classList.add('active');
+
+      // POPUP 8S VERT/GRIS
+      setTimeout(() => {
+        document.getElementById('modalBlock').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('modalBlock').classList.remove('active');
+        }, 8000);
+      }, 500);
+
+    }, 4000);
+  } else {
+    alert('Identifiants incorrects. Utilisez: 4590290859 / 156120');
+    secretCode = '';
+    codeDots.forEach(d => d.classList.remove('filled'));
+    btnAcceder.classList.remove('active');
+  }
+};
+
+btnDeconnexion.onclick = () => {
+  pageBanque.classList.remove('active');
+  pageAccueil.classList.add('active');
+  numClient.value = '';
+  secretCode = '';
+  codeDots.forEach(d => d.classList.remove('filled'));
+  codeSection.classList.remove('active');
+  keypad.classList.remove('active');
+  btnAcceder.classList.remove('active');
+  showView('comptes');
+  showTab('comptes');
+  document.getElementById('alertVirement').classList.remove('active');
+};
+
+// SYSTEME DE VUES SIDEBAR
+function showView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewName).classList.add('active');
+
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.sidebar-item[data-view="${viewName}"]`)?.classList.add('active');
+}
+
+// SYSTEME ONGLETS HAUT FONCTIONNELS
+function showTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tabName}"]`)?.classList.add('active');
+
+  // Map tab vers view
+  const map = {
+    'comptes': 'comptes',
+    'cartes': 'cartes',
+    'assurances': 'assurances',
+    'epargne': 'epargne',
+    'credits': 'credits'
+  };
+  if(map[tabName]) showView(map[tabName]);
+}
+
+// Clic sidebar
+document.querySelectorAll('.sidebar-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const view = btn.getAttribute('data-view');
+    showView(view);
+  });
+});
+
+// Clic onglets haut
+document.querySelectorAll('.tab[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.getAttribute('data-tab');
+    showTab(tab);
+  });
+});
+
+// Boutons retour avec data-tab
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  if(btn.classList.contains('btn-action')) {
+    btn.addEventListener('click', () => {
+      showTab(btn.getAttribute('data-tab'));
+    });
+  }
+});
+
+// ===== RIB MODIFIABLE =====
+document.getElementById('btnSaveRIB').onclick = () => {
+  alert('RIB enregistré : ' + document.getElementById('ribIban').value);
+};
+
+// ===== SIMULATION VIREMENT COMPLETE =====
+document.getElementById('btnValiderVirement').onclick = () => {
+  const montant = parseFloat(document.getElementById('montantVirement').value);
+  const benef = document.getElementById('benefSelect').value;
+  const motif = document.getElementById('motifVirement').value;
+
+  if(!montant || montant <= 0) {
+    alert('Saisissez un montant valide');
+    return;
+  }
+  if(!benef) {
+    alert('Sélectionnez un bénéficiaire');
+    return;
+  }
+  if(montant > currentSolde) {
+    alert('Solde insuffisant');
+    return;
+  }
+
+  // Calcul nouveau solde
+  currentSolde = currentSolde - montant;
+
+  // Update affichage solde
+  document.getElementById('liquidites').textContent = currentSolde.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + ' €';
+  document.getElementById('soldeTotal').textContent = (currentSolde + 13400 + 350000 - 2500).toLocaleString('fr-FR', {minimumFractionDigits: 2}) + ' €';
+
+  // Ajouter ligne dans tableau
+  const tbody = document.getElementById('tbodyOps');
+  const today = new Date().toLocaleDateString('fr-FR');
+  const newRow = `<tr>
+    <td>${today}</td>
+    <td>Virement vers ${benef} - ${motif || 'Sans motif'}</td>
+    <td style="color:#d32f2f;font-weight:600">-${montant.toFixed(2).replace('.',',')} €</td>
+    <td>${currentSolde.toFixed(2).replace('.',',')} €</td>
+  </tr>`;
+  tbody.insertAdjacentHTML('afterbegin', newRow);
+
+  // Afficher alerte succès
+  const alertV = document.getElementById('alertVirement');
+  alertV.classList.add('active');
+  setTimeout(() => alertV.classList.remove('active'), 4000);
+
+  // Reset form
+  document.getElementById('montantVirement').value = '';
+  document.getElementById('motifVirement').value = '';
+  document.getElementById('benefSelect').value = '';
+};
+
+// Burger menu mobile
+document.getElementById('burger').onclick = () => document.getElementById('navRight').classList.toggle('active');
+document.getElementById('burger2').onclick = () => document.getElementById('navRight2').classList.toggle('active');
+
+// Clear numéro
+document.getElementById('clearNum').onclick = () => numClient.value = '';
+</script>
+
+</body>
+</html>
